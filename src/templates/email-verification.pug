@@ -1,0 +1,45 @@
+style.
+    * {
+        font-family: sans-serif;
+    }
+
+    .header {
+        text-align: center;
+        background-color: black;
+        color: white;
+    }
+
+    a {
+        padding: 0 5px;
+        background-color: black;
+        color: white;
+    }
+
+    a.button {
+        background-color: black;
+        padding: 10px;
+        color: white;
+    }
+
+    p {
+        color: black;
+    }
+
+div(class='header')
+    h1 #{siteName}
+
+p Hi there!
+
+p Please click the button below to verify your email address and complete your sign up.
+
+a(href=verificationUrl, class="button") Verify my email address
+
+p You are receiving this email because you recently signed up for an account on #{siteName}.
+
+p If you did not request this email, you can safely ignore it. We not have any record of you signing up on #{siteName} yet.
+
+if sourceCodeURL
+    p
+        | Don't worry, your account is safe. Check the 
+        a(href=sourceCodeURL) source code
+        |  to see how we verify your email address.
