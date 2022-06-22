@@ -1,31 +1,32 @@
 name: CI
 
-on:
-  [pull_request]
+on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [16.x]
 
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/blog_db
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-    - name: Install dependencies
-      run: yarn
-    - name: Test
-      run: yarn test
-    - name: Coverage
-      uses: mattallty/jest-github-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        test-command: "yarn test:cov"
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+      - name: Test
+        run: yarn test
+      - name: Coverage
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          test-command: 'yarn test:cov'
