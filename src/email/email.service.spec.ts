@@ -39,4 +39,19 @@ describe('EmailService', () => {
       },
     });
   });
+
+  it('should send a blocked account notice', async () => {
+    mailerService.sendMail = jest.fn();
+    service.sendBlockedAccountNotice('josh@test.com', 'http://test.com');
+    expect(mailerService.sendMail).toHaveBeenCalled();
+    expect(mailerService.sendMail).toHaveBeenCalledWith({
+      to: 'josh@test.com',
+      subject: `Your account has been blocked on ${config.get('app.siteName')}`,
+      template: 'blocked-account',
+      context: {
+        siteName: config.get('app.siteName'),
+        unblockUrl: 'http://test.com',
+      },
+    });
+  });
 });
