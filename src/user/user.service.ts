@@ -45,7 +45,41 @@ export class UserService {
     );
   }
 
-  createUser() {
-    throw new HttpException('Not implemented yet', 501);
+  async createUser(emailToken: string, password: string) {
+    try {
+      type Payload = {
+        email: string;
+        username: string;
+      };
+      const { email, username } = verify(
+        emailToken,
+        this.config.get('app.emailSecret'),
+      ) as Payload;
+      const secret = await generateSecret();
+      const hash = await encrypt(password, secret);
+      const user = await this.prismaService.user.create({
+        data: {
+          email,
+          username,
+          password: hash,
+          secret,
+        },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+        },
+      });
+      const token = sign(
+        { id: user.id, secret },
+        this.config.get('app.appSecret'),
+      );
+      return {
+        token,
+        ...user,
+      };
+    } catch (error) {
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+    }
   }
 }

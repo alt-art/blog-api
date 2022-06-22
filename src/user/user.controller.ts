@@ -19,7 +19,7 @@ export class UserController {
   }
 
   @Post()
-  createUser() {
-    return this.userService.createUser();
+  createUser(@Body() { token, password }: CreateUserDTO) {
+    return this.userService.createUser(token, password);
   }
 }
