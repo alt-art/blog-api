@@ -6,7 +6,7 @@ import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma.service';
 import { UserService } from './user.service';
 import { faker } from '@faker-js/faker';
-import { verify } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 describe('UserService', () => {
@@ -53,7 +53,10 @@ describe('UserService', () => {
       const verificationUrl = (emailService.sendEmailVerification as jest.Mock)
         .mock.calls[0][1];
       const token = verificationUrl.split('=').pop();
-      const payload = verify(token, config.get('app.emailSecret')) as Payload;
+      const payload = jwt.verify(
+        token,
+        config.get('app.emailSecret'),
+      ) as Payload;
       expect(payload.username).toBe(userCreationRequest.username);
       expect(payload.email).toBe(userCreationRequest.email);
       expect(prismaService.user.findUnique).toHaveBeenCalledWith({
@@ -125,6 +128,43 @@ describe('UserService', () => {
         expect(e.getStatus()).toBe(HttpStatus.BAD_REQUEST);
       }
       expect(emailService.sendEmailVerification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('create user', () => {
+    it('should create a user with the information provided by the token and password', async () => {
+      const user = {
+        id: faker.random.numeric(),
+        email: faker.internet.email(),
+        username: faker.internet.userName(),
+      };
+      const token = jwt.sign(
+        {
+          email: user.email,
+          username: user.username,
+        },
+        config.get('app.emailSecret'),
+      );
+      const password = faker.internet.password();
+      jest.spyOn(jwt, 'sign').mockImplementation(() => 'dummy token');
+      prismaService.user.create = jest.fn().mockResolvedValue(user);
+      const response = await service.createUser(token, password);
+      expect(response).toEqual({ ...user, token: 'dummy token' });
+    });
+
+    it('should throw an error if the token is invalid', async () => {
+      const token = 'invalid token';
+      const password = faker.internet.password();
+      prismaService.user.create = jest.fn();
+      try {
+        await service.createUser(token, password);
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e).toBeInstanceOf(HttpException);
+        expect(e.message).toBe('Invalid token');
+        expect(e.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
+      }
+      expect(prismaService.user.create).not.toHaveBeenCalled();
     });
   });
 });
