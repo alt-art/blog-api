@@ -3,6 +3,8 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from 'nestjs-config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { resolve } from 'path';
+import { AuthModule } from './auth/auth.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { resolve } from 'path';
       inject: [ConfigService],
     }),
     UserModule,
+    AuthModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

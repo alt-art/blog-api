@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from 'nestjs-config';
+import app from '../config/app';
 import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma.service';
 import { encrypt, generateSecret } from '../utils/encryption';
@@ -70,10 +71,7 @@ export class UserService {
           username: true,
         },
       });
-      const token = sign(
-        { id: user.id, secret },
-        this.config.get('app.appSecret'),
-      );
+      const token = sign({ id: user.id, secret }, app.appSecret);
       return {
         token,
         ...user,
