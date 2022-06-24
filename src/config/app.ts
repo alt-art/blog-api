@@ -6,4 +6,5 @@ export default {
   port: process.env.PORT || 3000,
   emailSecret: randomBytes(256),
   appSecret: randomBytes(256),
+  unblockAccountUrl: process.env.UNBLOCK_ACCOUNT_URL,
 };

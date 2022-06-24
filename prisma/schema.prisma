@@ -19,6 +19,7 @@ model User {
   email     String   @unique
   secret    String
   password  String
+  trysCount Int      @default(0)
   posts     Post[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
