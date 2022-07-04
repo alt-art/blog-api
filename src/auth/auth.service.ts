@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { ConfigService } from 'nestjs-config';
+import app from '../config/app';
 import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma.service';
 import { compare } from '../utils/encryption';
@@ -31,11 +32,14 @@ export class AuthService {
         data: { trysCount: user.trysCount + 1 },
       });
       if (trysCount >= 20) {
-        const token = this.jwtService.sign({
-          id: user.id,
-          email: user.email,
-          secret: user.secret,
-        });
+        const token = this.jwtService.sign(
+          {
+            id: user.id,
+            email: user.email,
+            secret: user.secret,
+          },
+          { secret: app.emailSecret },
+        );
         const unblockAccountUrl = `${this.config.get(
           'app.unblockAccountUrl',
         )}?token=${token}`;
@@ -65,7 +69,9 @@ export class AuthService {
       email: user.email,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      token: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payload, {
+        secret: app.appSecret,
+      }),
     };
   }
 }
