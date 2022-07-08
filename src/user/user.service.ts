@@ -82,20 +82,16 @@ export class UserService {
   }
 
   async unblockUser(id: string) {
-    try {
-      const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+    if (user.trysCount >= 20) {
+      await this.prismaService.user.update({
         where: { id },
+        data: {
+          trysCount: 0,
+        },
       });
-      if (user.trysCount >= 20) {
-        await this.prismaService.user.update({
-          where: { id },
-          data: {
-            trysCount: 0,
-          },
-        });
-      }
-    } catch (error) {
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
   }
 }
