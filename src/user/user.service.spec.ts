@@ -167,4 +167,31 @@ describe('UserService', () => {
       expect(prismaService.user.create).not.toHaveBeenCalled();
     });
   });
+
+  describe('shold unblock a user', () => {
+    it('should unblock a user', async () => {
+      const user = {
+        id: faker.random.numeric(),
+        email: faker.internet.email(),
+        username: faker.internet.userName(),
+        trysCount: 20,
+      };
+      prismaService.user.findUnique = jest.fn().mockResolvedValue(user);
+      prismaService.user.update = jest.fn().mockResolvedValue(user);
+      await service.unblockUser(user.id);
+      expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+        where: {
+          id: user.id,
+        },
+      });
+      expect(prismaService.user.update).toHaveBeenCalledWith({
+        where: {
+          id: user.id,
+        },
+        data: {
+          trysCount: 0,
+        },
+      });
+    });
+  });
 });
