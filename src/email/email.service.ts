@@ -20,4 +20,18 @@ export class EmailService {
       },
     });
   }
+
+  sendBlockedAccountNotice(email: string, unblockUrl: string) {
+    return this.mailerService.sendMail({
+      to: email,
+      subject: `Your account has been blocked on ${this.config.get(
+        'app.siteName',
+      )}`,
+      template: 'blocked-account',
+      context: {
+        siteName: this.config.get('app.siteName'),
+        unblockUrl,
+      },
+    });
+  }
 }
