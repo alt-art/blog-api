@@ -1,9 +1,11 @@
 import { randomBytes } from 'crypto';
+import 'dotenv/config';
 
+console.log(process.env.PORT);
 export default {
   siteName: process.env.SITE_NAME || 'Site Name',
   sourceCodeUrl: process.env.SOURCE_CODE_URL,
-  port: process.env.PORT || 3000,
+  port: process.env.PORT,
   emailSecret: randomBytes(256),
   appSecret: randomBytes(256),
   unblockAccountUrl:
