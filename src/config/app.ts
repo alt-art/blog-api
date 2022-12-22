@@ -1,7 +1,6 @@
 import { randomBytes } from 'crypto';
 import 'dotenv/config';
 
-console.log(process.env.PORT);
 export default {
   siteName: process.env.SITE_NAME || 'Site Name',
   sourceCodeUrl: process.env.SOURCE_CODE_URL,
