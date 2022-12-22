@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -39,5 +40,10 @@ export class UserController {
   @Get('unblock')
   unblockUser(@Request() req: RequestWithUser) {
     return this.userService.unblockUser(req.user.id);
+  }
+
+  @Get('username-exists')
+  usernameExists(@Query('username') username: string) {
+    return this.userService.usernameExists(username);
   }
 }

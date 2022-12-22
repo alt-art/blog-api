@@ -94,4 +94,17 @@ export class UserService {
       });
     }
   }
+
+  async usernameExists(username: string) {
+    if (!username) {
+      throw new HttpException('Username is required', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.prismaService.user.findUnique({
+      where: { username },
+    });
+    return {
+      exists: !!user,
+    };
+  }
 }
