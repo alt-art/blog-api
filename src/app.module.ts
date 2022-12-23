@@ -5,6 +5,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { resolve } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AppController } from './app.controller';
     }),
     UserModule,
     AuthModule,
+    PostModule,
   ],
   controllers: [AppController],
 })
