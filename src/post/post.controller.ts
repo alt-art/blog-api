@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
 import { Roles } from '../auth/roles.decorator';
@@ -16,5 +23,10 @@ export class PostController {
   @Post()
   createPost(@Body() post: CreatePostDto, @Request() req: RequestWithUser) {
     return this.postService.createPost(post, req.user);
+  }
+
+  @Get()
+  getPosts() {
+    return this.postService.getPosts();
   }
 }
