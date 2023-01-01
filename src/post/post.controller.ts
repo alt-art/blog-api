@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Request,
   UseGuards,
@@ -28,5 +30,10 @@ export class PostController {
   @Get()
   getPosts() {
     return this.postService.getPosts();
+  }
+
+  @Get(':id')
+  getPost(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postService.getPost(id);
   }
 }

@@ -34,4 +34,23 @@ export class PostService {
       },
     });
   }
+
+  async getPost(id: string) {
+    return await this.prismaService.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+  }
 }
