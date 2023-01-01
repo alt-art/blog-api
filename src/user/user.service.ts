@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from 'nestjs-config';
 import app from '../config/app';
@@ -13,7 +12,6 @@ export class UserService {
   constructor(
     private emailService: EmailService,
     private prismaService: PrismaService,
-    private jwtService: JwtService,
     private config: ConfigService,
   ) {}
 

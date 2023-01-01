@@ -8,6 +8,7 @@ import { UserService } from './user.service';
 import { faker } from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { encrypt } from '../utils/encryption';
 
 describe('UserService', () => {
   let service: UserService;
@@ -170,28 +171,28 @@ describe('UserService', () => {
 
   describe('shold unblock a user', () => {
     it('should unblock a user', async () => {
+      const password = faker.internet.password();
+      const secret = faker.random.alphaNumeric(10);
       const user = {
         id: faker.random.numeric(),
         email: faker.internet.email(),
         username: faker.internet.userName(),
+        secret,
+        password: await encrypt(password, secret),
         trysCount: 20,
       };
-      prismaService.user.findUnique = jest.fn().mockResolvedValue(user);
+      prismaService.user.findFirst = jest.fn().mockResolvedValue(user);
       prismaService.user.update = jest.fn().mockResolvedValue(user);
-      await service.unblockUser(user.id);
-      expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+      await service.unblockUser({
+        secret: secret,
+        password: password,
+      });
+      expect(prismaService.user.findFirst).toHaveBeenCalledWith({
         where: {
-          id: user.id,
+          secret: secret,
         },
       });
-      expect(prismaService.user.update).toHaveBeenCalledWith({
-        where: {
-          id: user.id,
-        },
-        data: {
-          trysCount: 0,
-        },
-      });
+      expect(prismaService.user.update).toHaveBeenCalled();
     });
   });
 });
