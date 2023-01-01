@@ -32,17 +32,9 @@ export class AuthService {
         data: { trysCount: user.trysCount + 1 },
       });
       if (trysCount >= 20) {
-        const token = this.jwtService.sign(
-          {
-            id: user.id,
-            email: user.email,
-            secret: user.secret,
-          },
-          { secret: app.emailSecret },
-        );
         const unblockAccountUrl = `${this.config.get(
           'app.unblockAccountUrl',
-        )}?token=${token}`;
+        )}?token=${user.secret}`;
         await this.emailService.sendBlockedAccountNotice(
           user.email,
           unblockAccountUrl,

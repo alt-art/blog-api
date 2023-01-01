@@ -13,6 +13,7 @@ import { Request as Req } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDTO } from './dto/createUser';
 import { RequestUserCreationDTO } from './dto/requestUserCreation';
+import { UnblockUserDto } from './dto/unblockUser';
 import { UserService } from './user.service';
 
 export type RequestWithUser = Req & { user: User };
@@ -46,10 +47,9 @@ export class UserController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('unblock')
-  unblockUser(@Request() req: RequestWithUser) {
-    return this.userService.unblockUser(req.user.id);
+  @Post('unblock')
+  unblockUser(@Body() data: UnblockUserDto) {
+    return this.userService.unblockUser(data);
   }
 
   @Get('username-exists')

@@ -1,16 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from 'nestjs-config';
 import app from '../config/app';
 import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma.service';
-import { encrypt, generateSecret } from '../utils/encryption';
+import { compare, encrypt, generateSecret } from '../utils/encryption';
+import { UnblockUserDto } from './dto/unblockUser';
 
 @Injectable()
 export class UserService {
   constructor(
     private emailService: EmailService,
     private prismaService: PrismaService,
+    private jwtService: JwtService,
     private config: ConfigService,
   ) {}
 
@@ -81,18 +84,26 @@ export class UserService {
     }
   }
 
-  async unblockUser(id: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { id },
+  async unblockUser(data: UnblockUserDto) {
+    const user = await this.prismaService.user.findFirst({
+      where: { secret: data.secret },
     });
-    if (user.trysCount >= 20) {
-      await this.prismaService.user.update({
-        where: { id },
-        data: {
-          trysCount: 0,
-        },
-      });
+    if (!user) {
+      throw new HttpException('Invalid secret', HttpStatus.UNAUTHORIZED);
     }
+    if (!compare(data.password, user.password, user.secret)) {
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+    }
+    const secret = await generateSecret();
+    const hash = await encrypt(data.password, secret);
+    await this.prismaService.user.update({
+      where: { id: user.id },
+      data: {
+        password: hash,
+        secret,
+        trysCount: 0,
+      },
+    });
   }
 
   async usernameExists(username: string) {
